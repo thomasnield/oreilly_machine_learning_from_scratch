@@ -89,7 +89,7 @@ print("1.0 / (1 + exp(-({0} + {1}*s + {2}*a + {3}*p + {4}*y))".format(b0, b1, b2
 print("BEST LIKELIHOOD: {0}".format(math.exp(best_likelihood)))
 
 
-# Interact and test with new colors
+# Interact and test with new employee data
 def predict_employee_will_stay(sex, age, promotions, years_employed):
     probability_of_leaving = predict_probability(sex, age, promotions, years_employed)
     if probability_of_leaving >= .5:
