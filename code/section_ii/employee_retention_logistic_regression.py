@@ -31,7 +31,6 @@ iterations = 50_000
 
 # calculate maximum likelihood
 
-# Closer to true (1.0) recommends dark font, closer to false (0.0) recommends light font
 def predict_probability(sex, age, promotions, years_employed):
     x = round(-(b0 + (b1 * sex) + (b2 * age) + (b3 * promotions) + (b4 * years_employed)), 4)
     odds = exp(x)
