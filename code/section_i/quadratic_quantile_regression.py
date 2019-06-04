@@ -37,8 +37,8 @@ for i in range(epochs):
 
     # Randomly adjust "a" and "b"
 
-    a_adjust = np.random.standard_t(3, 1)[0] # normalvariate(0, 1)
-    b_adjust = np.random.standard_t(3, 1)[0] # normalvariate(0, 1)
+    a_adjust = np.random.standard_normal()
+    b_adjust = np.random.standard_normal()
 
     a += a_adjust
     b += b_adjust
