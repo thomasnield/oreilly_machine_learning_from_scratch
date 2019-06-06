@@ -49,7 +49,7 @@ for i in range(200_000):
     new_loss = 0.0
 
     for p in points:
-        new_loss += distance_between(p, closest_centroid_for(p))
+        new_loss += distance_between(p, closest_centroid_for(p))**2
 
     if new_loss < best_loss:
         best_loss = new_loss
