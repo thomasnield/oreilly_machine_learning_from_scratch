@@ -4,6 +4,7 @@ import random
 
 
 # Cluster points using k-means algorithm using hill climbing
+# This code version uses NumPy
 # Desmos graph: https://www.desmos.com/calculator/pb4ewmqdvy
 
 k = 4
