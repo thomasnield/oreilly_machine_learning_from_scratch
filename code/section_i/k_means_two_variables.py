@@ -3,7 +3,7 @@ import numpy as np
 import random
 
 
-# Cluster points using k-means algorithm using hill climbing
+# Cluster points using k-means algorithm with average-based heuristic
 # Desmos graph: https://www.desmos.com/calculator/pb4ewmqdvy
 
 class Point:
