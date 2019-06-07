@@ -1,8 +1,8 @@
 import random
 
 import math
-import pandas as pd
 import numpy as np
+import pandas as pd
 from numpy import log, exp
 
 
@@ -15,7 +15,7 @@ class EmployeeRetention:
         self.did_quit = did_quit
 
 
-training_data = [(EmployeeRetention(row[0], row[1], row[2], row[3], row[4])) for index, row in
+employee_data = [(EmployeeRetention(row[0], row[1], row[2], row[3], row[4])) for index, row in
                  pd.read_csv("https://tinyurl.com/y6r7qjrp").iterrows()]
 
 
@@ -31,10 +31,9 @@ iterations = 50_000
 
 # calculate maximum likelihood
 
-# Closer to true (1.0) recommends dark font, closer to false (0.0) recommends light font
 def predict_probability(sex, age, promotions, years_employed):
-    x = -(b0 + (b1 * sex) + (b2 * age) + (b3 * promotions) + (b4 * years_employed))
-    odds = exp(x)
+    x = b0 + (b1 * sex) + (b2 * age) + (b3 * promotions) + (b4 * years_employed)
+    odds = exp(-x)
     p = 1.0 / (1.0 + odds)
     return p
 
@@ -61,7 +60,7 @@ for i in range(iterations):
     # Use logarithmic addition to avoid multiplication and decimal underflow
     new_likelihood = 0.0
 
-    for emp in training_data:
+    for emp in employee_data:
 
         probability = predict_probability(emp.sex, emp.age, emp.promotions, emp.years_employed)
 

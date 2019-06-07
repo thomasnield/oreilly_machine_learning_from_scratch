@@ -67,8 +67,8 @@ def spam_score_for_message(message):
     message_words = [break_up_words(message)]
 
     probability_of_spam = 0.0
-    for word in message_words:
-        if (word in )
+#    for word in message_words:
+#       if (word in )
 
 # Test a new message
 message1 = "discount viagra wholesale, hurry while this offer lasts"

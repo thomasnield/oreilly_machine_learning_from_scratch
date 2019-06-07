@@ -1,16 +1,7 @@
-import pandas as pd
-from random import uniform, normalvariate, randint
 import numpy as np
+import pandas as pd
 
-# Generate random data around y = 4x + 50
-def f(x):
-    return 4 * x + 50
-
-data = pd.DataFrame(columns=["x", "y"])
-
-for i in range(1000):
-    x = round(uniform(1, 20), 2)
-    data = data.append(pd.DataFrame(columns=["x", "y"], data=[[x, round(f(x) + normalvariate(0, 50), 2)]]))
+data = pd.read_csv("https://tinyurl.com/y58sesrr")
 
 # Input data
 X = data.iloc[:, 0]
@@ -21,7 +12,7 @@ m = 0.0
 b = 0.0
 
 
-epochs = 200000  # The number of iterations to perform
+epochs = 150_000  # The number of iterations to perform
 
 n = float(len(X))  # Number of elements in X
 
@@ -43,12 +34,10 @@ for i in range(epochs):
 
     # If loss has improved, keep new values. Otherwise revert.
     if new_loss < best_loss:
+        print("y = {0}x + {1}".format(m, b))
         best_loss = new_loss
     else:
         m -= m_adjust
         b -= b_adjust
 
-    if i % 1000 == 0:
-        print(m, b)
-
-print(m, b)
+print("y = {0}x + {1}".format(m,b))
