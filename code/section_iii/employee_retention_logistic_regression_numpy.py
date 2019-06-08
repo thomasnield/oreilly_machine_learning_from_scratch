@@ -1,6 +1,3 @@
-# TODO From-scratch implementation yields reasonable function: 1.0 / (1 + exp(-(-1.6115171508028452 +
-#  0.08311667624297914*s + -0.010160499056227845*a + -2.474814416884098*p + 1.0499193862233702*y)) After a million
-#  iterations
 
 import random
 
@@ -19,7 +16,7 @@ training_inputs.insert(loc=0,column='b0',value=1.0)
 training_inputs = training_inputs.values
 
 # extract dependent variables (DID_QUIT) for all records
-training_outputs = employee_data.iloc[:,4:5].values
+training_outputs = employee_data.iloc[:,4:5].values.flatten()
 
 # track best_likelihood and beta values, which we will use hill-climbing to solve for
 best_likelihood = -100_000_000_000.0
@@ -39,7 +36,7 @@ for i in range(iterations):
     probabilities = 1.0 / (1.0 + np.exp(-1.0 * training_inputs.dot(betas)))
 
     true_likelihood = (np.log(probabilities) * training_outputs).sum()
-    false_likelihood = (np.log(1.0 - probabilities) * ((training_outputs - 1) **2)).sum()
+    false_likelihood = (np.log(1.00001 - probabilities) * ((training_outputs - 1) **2)).sum()
 
     new_likelihood = true_likelihood + false_likelihood
 
