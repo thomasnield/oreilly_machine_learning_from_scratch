@@ -1,8 +1,8 @@
 import random
 
+import math
 import numpy as np
 import pandas as pd
-import math
 
 
 # Desmos graph: https://www.desmos.com/calculator/6cb10atg3l
