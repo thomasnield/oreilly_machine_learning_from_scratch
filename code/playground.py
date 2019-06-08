@@ -1,7 +1,4 @@
-#TODO Still not working
 import re
-
-import math
 
 
 class Email:
@@ -26,7 +23,6 @@ emails = [
 
 spam_email_count = sum(1 for email in emails if email.is_spam)
 non_spam_email_count = sum(1 for email in emails if not email.is_spam)
-
 
 # Helper function to break up words from a string
 def break_up_words(str):
@@ -55,41 +51,3 @@ all_emails_count_by_word = dict()
 for email in emails:
     for word in break_up_words(email.message):
         all_emails_count_by_word[word] = all_emails_count_by_word.get(word, 0) + 1
-
-
-# Create functions to calculate probability of word occuring in spam or not spam
-# add a little .1 and .2 to numerator/denominator respectively to prevent 0 division
-def prob_word_appears_in_spam(word):
-    return (.1 + spam_count_by_word.get(word,0)) / (.2 + spam_email_count)
-
-
-def prob_word_appears_in_non_spam(word):
-    return (.1 + non_spam_count_by_word.get(word,0)) / (.2 + non_spam_email_count)
-
-
-# Here we go! Naive Bayes happens here
-def spam_score_for_message(message):
-    message_words = [break_up_words(message)]
-
-    probability_of_spam = 0.0
-    for w in all_emails_count_by_word:
-        if w in message_words:
-            probability_of_spam += math.log(prob_word_appears_in_spam(w))
-        else:
-            probability_of_spam += math.log(1.0 - prob_word_appears_in_spam(w))
-
-    probability_of_not_spam = 0.0
-    for w in all_emails_count_by_word:
-        if w in message_words:
-            probability_of_not_spam += math.log(prob_word_appears_in_non_spam(w))
-        else:
-            probability_of_not_spam += math.log(1.0 - prob_word_appears_in_non_spam(w))
-
-    return math.exp(probability_of_spam) / (math.exp(probability_of_spam) + math.exp(probability_of_not_spam))
-
-# Test a new message
-message1 = "discount viagra wholesale, hurry while this offer lasts"
-message2 = "interesting meeting on amazon cloud services discount program"
-
-print(spam_score_for_message(message1))
-print(spam_score_for_message(message2))
