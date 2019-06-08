@@ -1,7 +1,5 @@
-import pandas as pd
 import numpy as np
-import random
-
+import pandas as pd
 
 # Cluster points using k-means algorithm using hill climbing
 # This code version uses NumPy
@@ -15,10 +13,11 @@ centroids = np.zeros(k*2, dtype='float').reshape([4,2])
 best_loss = 1_000_000_000.0
 
 for i in range(100_000):
-    random_centroid = random.choice(centroids)
+
+    random_centroid = np.random.randint(0,k)
 
     random_xy_adjust = np.zeros(k*2).reshape([4,2])
-    random_xy_adjust[random.randint(0,k-1)] = np.random.standard_normal(2)
+    random_xy_adjust[random_centroid] = np.random.standard_normal(2)
     centroids += random_xy_adjust
 
     new_loss = 0.0
