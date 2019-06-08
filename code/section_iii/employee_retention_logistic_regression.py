@@ -67,7 +67,7 @@ for i in range(iterations):
         if emp.did_quit == 1:
             new_likelihood += log(probability)
         else:
-            new_likelihood += log(1.0 - probability)
+            new_likelihood += log(1.00001 - probability)
 
     # If solution improves, keep it and make it new best likelihood. Otherwise undo the adjustment
     if best_likelihood < new_likelihood:
