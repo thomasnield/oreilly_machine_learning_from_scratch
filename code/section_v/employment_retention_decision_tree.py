@@ -18,6 +18,12 @@ class Feature:
         self.feature_name = feature_name
         self.feature_type = feature_type
 
+features = [Feature("sex", "binary"),
+            Feature("age", "numeric"),
+            Feature("Promotions", "numeric"),
+            Feature("Years Employed", "numeric"),
+            Feature("Did Quit", "binary")]
+
 
 class TreeNode:
     def __init__(self, feature):
