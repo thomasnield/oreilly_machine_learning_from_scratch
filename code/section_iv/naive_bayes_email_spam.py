@@ -57,7 +57,7 @@ for email in emails:
         all_emails_count_by_word[word] = all_emails_count_by_word.get(word, 0) + 1
 
 
-# Create functions to calculate probability of word occuring in spam or not spam
+# Create functions to calculate probability of word occurring in spam or not spam
 # add a little .1 and .2 to numerator/denominator respectively to prevent 0 division
 def prob_word_appears_in_spam(w):
     return (.1 + spam_count_by_word.get(w, 0)) / (.2 + spam_email_count)
