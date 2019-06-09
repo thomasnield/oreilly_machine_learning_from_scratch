@@ -1,53 +1,27 @@
-import re
+import numpy as np
+
+centroids = np.array([
+    [10, 10],
+    [0,0],
+    [20,20]
+])
+
+points = np.array([
+    [1,1],
+    [2,2],
+    [7,7],
+    [8,8],
+    [17,17],
+    [19,19]
+])
+
+distances = np.sqrt(((points - centroids[:,np.newaxis])**2).sum(axis=2))
+
+min_distances_indices = np.argmin(distances,axis=0)
+min_distances = distances * np.argmin(distances, axis=0)
+new_loss = (min_distances ** 2).sum(axis=0)
 
 
-class Email:
-    def __init__(self, message, is_spam):
-        self.message = message
-        self.is_spam = is_spam
-
-
-emails = [
-    Email("Hey there! I thought you might find this interesting. Click here.", True),
-    Email("Get viagra for a discount as much as 90%", True),
-    Email("Viagra prescription for less", True),
-    Email("Even better than Viagra, try this new prescription drug", True),
-
-    Email("Hey, I left my phone at home. Email me if you need anything. I'll be in a meeting for the afternoon.",False),
-    Email("Please see attachment for notes on today's meeting. Interesting findings on your market research.", False),
-    Email("An item on your Amazon wish list received a discount", False),
-    Email("Your prescription drug order is ready", False),
-    Email("Your Amazon account password has been reset", False),
-    Email("Your Amazon order", False)
-]
-
-spam_email_count = sum(1 for email in emails if email.is_spam)
-non_spam_email_count = sum(1 for email in emails if not email.is_spam)
-
-# Helper function to break up words from a string
-def break_up_words(str):
-    return re.sub(r'[^\w\s]', '', str.lower()).split()
-
-
-# get count of words for spam emails
-spam_count_by_word = dict()
-
-for email in emails:
-    if email.is_spam:
-        for word in break_up_words(email.message):
-            spam_count_by_word[word] = spam_count_by_word.get(word, 0) + 1
-
-# get count of words for non-spam emails
-non_spam_count_by_word = dict()
-
-for email in emails:
-    if not email.is_spam:
-        for word in break_up_words(email.message):
-            non_spam_count_by_word[word] = non_spam_count_by_word.get(word, 0) + 1
-
-# get count of words in all emails
-all_emails_count_by_word = dict()
-
-for email in emails:
-    for word in break_up_words(email.message):
-        all_emails_count_by_word[word] = all_emails_count_by_word.get(word, 0) + 1
+print(distances)
+print("\r\n\r\n")
+print(min_distances)
