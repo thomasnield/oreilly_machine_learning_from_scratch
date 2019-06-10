@@ -40,14 +40,15 @@ def gini_impurity(sample_employees):
             len(non_quit_employees) / (len(sample_employees) + .0001)) ** 2
 
 
-def gini_impurity_for_feature(feature, boundary_value, sample_employees):
+def gini_impurity_for_feature(feature, split_value, sample_employees):
     feature_positive_employees = [employee for employee in sample_employees if
-                                  feature.value_extractor(employee) >= boundary_value]
+                                  feature.value_extractor(employee) >= split_value]
     feature_negative_employees = [employee for employee in sample_employees if
-                                  feature.value_extractor(employee) < boundary_value]
+                                  feature.value_extractor(employee) < split_value]
 
     return ((len(feature_positive_employees) / len(sample_employees)) * gini_impurity(feature_positive_employees)) + (
             (len(feature_negative_employees) / len(sample_employees)) * gini_impurity(feature_negative_employees))
+
 
 def split_continuous_variable(feature, sample_employees):
     feature_values = list(set(feature.value_extractor(employee) for employee in sample_employees))
@@ -60,20 +61,48 @@ def split_continuous_variable(feature, sample_employees):
 
     for pair in zipped_values:
         split_value = (pair[0] + pair[1]) / 2
-        impurity = gini_impurity_for_feature(feature,split_value, sample_employees)
+        impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
         if impurity < best_impurity:
             best_impurity = impurity
             best_split = split_value
 
     return best_split
 
+
 class TreeLeaf:
-    def __init__(self, feature, feature_value):
+
+    def __init__(self, feature, split_value, sample_employees):
         self.feature = feature
-        self.feature_value = feature_value
+        self.split_value = split_value
+        self.sample_employees = sample_employees
+        self.positive_employees = [e for e in sample_employees if feature.value_extractor(e) >= split_value]
+        self.negative_employees = [e for e in sample_employees if feature.value_extractor(e) < split_value]
+
+    def __str__(self):
+        return "{0} split on {1}, {2}|{3}".format(self.feature, self.split_value, len(self.positive_employees), len(self.negative_employees))
 
 
-for feature in features:
-    feature_avg = sum([ feature.value_extractor(employee) for employee in all_employees]) / len(all_employees)
-    print("{0}: {1}".format(feature, gini_impurity_for_feature(feature, split_continuous_variable(feature,all_employees), all_employees)))
-    print("{0}: {1}".format(feature, split_continuous_variable(feature,all_employees)))
+def choose_leaf(sample_employees):
+    best_impurity = 1.0
+    best_feature = None
+
+    for feature in features:
+        split_value = split_continuous_variable(feature, sample_employees)
+        impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
+
+        if best_impurity > impurity:
+            best_impurity = impurity
+            best_feature = feature
+
+    return TreeLeaf(best_feature, best_impurity, sample_employees)
+
+
+def build_branch(sample_employees):
+    tree_leaf = choose_leaf(sample_employees)
+    print(tree_leaf)
+
+    next_positive_leaf = build_branch(tree_leaf.positive_employees)
+    next_negative_leaf = build_branch(tree_leaf.negative_employees)
+
+
+build_branch(all_employees)
