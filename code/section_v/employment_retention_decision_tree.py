@@ -15,19 +15,20 @@ all_employees = [(EmployeeRetention(row[0], row[1], row[2], row[3], row[4])) for
 
 
 class Feature:
-    def __init__(self, feature_name, feature_type, value_extractor):
+    def __init__(self, feature_name, value_extractor):
         self.feature_name = feature_name
-        self.feature_type = feature_type
         self.value_extractor = value_extractor
 
     def __str__(self):
         return self.feature_name
 
 
-features = [Feature("sex", "binary", lambda emp: emp.sex),
-            Feature("age", "numeric", lambda emp: emp.age),
-            Feature("Promotions", "numeric", lambda emp: emp.promotions),
-            Feature("Years Employed", "numeric", lambda emp: emp.years_employed)]
+features = [Feature("sex", lambda emp: emp.sex),
+            Feature("age", lambda emp: emp.age),
+            Feature("Promotions", lambda emp: emp.promotions),
+            Feature("Years Employed", lambda emp: emp.years_employed)]
+
+# Feature("Promotion Rate", lambda emp: emp.promotions / emp.years_employed)
 
 outcomes = ["WILL_STAY", "WILL_LEAVE"]
 
@@ -52,6 +53,8 @@ def gini_impurity_for_feature(feature, split_value, sample_employees):
 
 def split_continuous_variable(feature, sample_employees):
     feature_values = list(set(feature.value_extractor(employee) for employee in sample_employees))
+    feature_values.sort()
+
     feature_values2 = feature_values.copy()
     feature_values2.pop(0)
 
@@ -71,23 +74,27 @@ def split_continuous_variable(feature, sample_employees):
 
 class TreeLeaf:
 
-    def __init__(self, feature, split_value, sample_employees, remaining_features):
+    def __init__(self, feature, split_value, sample_employees, previous_leaf):
         self.feature = feature
         self.split_value = split_value
         self.sample_employees = sample_employees
+        self.previous_leaf = previous_leaf
         self.positive_employees = [e for e in sample_employees if feature.value_extractor(e) >= split_value]
         self.negative_employees = [e for e in sample_employees if feature.value_extractor(e) < split_value]
-        self.remaining_features = remaining_features
+        self.gini_impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
+
+        self.improves_impurity = previous_leaf is None or previous_leaf.gini_impurity > self.gini_impurity
 
     def __str__(self):
-        return "{0} split on {1}, {2}|{3}".format(self.feature, self.split_value, len(self.positive_employees), len(self.negative_employees))
+        return "{0} split on {1}, {2}|{3}, Impurity: {4}".format(self.feature, self.split_value, len(self.positive_employees),
+                                                  len(self.negative_employees), self.gini_impurity)
 
 
-def choose_leaf(sample_employees, remaining_features):
+def choose_leaf(sample_employees, previous_leaf):
     best_impurity = 1.0
     best_feature = None
 
-    for feature in remaining_features:
+    for feature in features:
         split_value = split_continuous_variable(feature, sample_employees)
         impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
 
@@ -95,21 +102,18 @@ def choose_leaf(sample_employees, remaining_features):
             best_impurity = impurity
             best_feature = feature
 
-    pop_feature = remaining_features.copy()
-    pop_feature.remove(best_feature)
-    return TreeLeaf(best_feature, best_impurity, sample_employees, pop_feature)
+    return TreeLeaf(best_feature, best_impurity, sample_employees, previous_leaf)
 
 
-def build_branch(sample_employees, remaining_features):
-
-    tree_leaf = choose_leaf(sample_employees, remaining_features)
+def build_branch(sample_employees, previous_leaf=None):
+    tree_leaf = choose_leaf(sample_employees, previous_leaf)
     print(tree_leaf)
 
-    if len(tree_leaf.remaining_features) == 0:
+    if tree_leaf.improves_impurity:
         return tree_leaf
+    else:
+        return build_branch(tree_leaf.positive_employees, tree_leaf)
+        # return build_branch(tree_leaf.negative_employees, tree_leaf)
 
-    next_positive_leaf = build_branch(tree_leaf.positive_employees, remaining_features)
-    next_negative_leaf = build_branch(tree_leaf.negative_employees, remaining_features)
 
-
-build_branch(all_employees, features)
+build_branch(all_employees)
