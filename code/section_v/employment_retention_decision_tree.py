@@ -23,8 +23,8 @@ class Feature:
         return self.feature_name
 
 
-features = [Feature("sex", lambda emp: emp.sex),
-            Feature("age", lambda emp: emp.age),
+features = [Feature("Sex", lambda emp: emp.sex),
+            Feature("Age", lambda emp: emp.age),
             Feature("Promotions", lambda emp: emp.promotions),
             Feature("Years Employed", lambda emp: emp.years_employed)]
 
@@ -83,37 +83,66 @@ class TreeLeaf:
         self.negative_employees = [e for e in sample_employees if feature.value_extractor(e) < split_value]
         self.gini_impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
 
-        self.improves_impurity = previous_leaf is None or previous_leaf.gini_impurity > self.gini_impurity
+        self.positive_leaf = build_leaf(self.positive_employees, self)
+        self.negative_leaf = build_leaf(self.negative_employees, self)
+
+    def predict(self, employee):
+        print(self)
+        feature_value = self.feature.value_extractor(employee)
+        if feature_value >= self.split_value:
+            if self.positive_leaf is None:
+                return len(self.positive_employees) / len(self.sample_employees)
+            else:
+                return self.positive_leaf.predict(employee)
+        else:
+            if self.negative_leaf is None:
+                return len(self.positive_employees) / len(self.sample_employees)
+            else:
+                return self.negative_leaf.predict(employee)
 
     def __str__(self):
-        return "{0} split on {1}, {2}|{3}, Impurity: {4}".format(self.feature, self.split_value, len(self.positive_employees),
-                                                  len(self.negative_employees), self.gini_impurity)
+        return "{0} split on {1}, {2}|{3}, Impurity: {4}".format(self.feature, self.split_value,
+                                                                 len(self.positive_employees),
+                                                                 len(self.negative_employees), self.gini_impurity)
 
 
-def choose_leaf(sample_employees, previous_leaf):
+
+
+def build_leaf(sample_employees, previous_leaf):
     best_impurity = 1.0
+    best_split = None
     best_feature = None
 
     for feature in features:
         split_value = split_continuous_variable(feature, sample_employees)
+
+        if split_value is None:
+            continue
+
         impurity = gini_impurity_for_feature(feature, split_value, sample_employees)
 
         if best_impurity > impurity:
             best_impurity = impurity
             best_feature = feature
+            best_split = split_value
 
-    return TreeLeaf(best_feature, best_impurity, sample_employees, previous_leaf)
-
-
-def build_branch(sample_employees, previous_leaf=None):
-    tree_leaf = choose_leaf(sample_employees, previous_leaf)
-    print(tree_leaf)
-
-    if tree_leaf.improves_impurity:
-        return tree_leaf
+    if previous_leaf is None or best_impurity < previous_leaf.gini_impurity:
+        return TreeLeaf(best_feature, best_split, sample_employees, previous_leaf)
     else:
-        return build_branch(tree_leaf.positive_employees, tree_leaf)
-        # return build_branch(tree_leaf.negative_employees, tree_leaf)
+        return None
 
 
-build_branch(all_employees)
+tree = build_leaf(all_employees, None)
+
+
+def recurse_and_print_tree(leaf, depth=0):
+    if leaf is not None:
+        print(("\t" * depth) + "({0}) ".format(depth) + str(leaf))
+        recurse_and_print_tree(leaf.negative_leaf, depth + 1)
+        recurse_and_print_tree(leaf.positive_leaf, depth + 1)
+
+
+recurse_and_print_tree(tree)
+
+
+print(tree.predict(EmployeeRetention(0,44,3,10,0)))
