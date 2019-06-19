@@ -145,4 +145,4 @@ def recurse_and_print_tree(leaf, depth=0):
 recurse_and_print_tree(tree)
 
 
-print(tree.predict(EmployeeRetention(0,44,3,10,0)))
+print(tree.predict(EmployeeRetention(0,38,2,4,0)))
