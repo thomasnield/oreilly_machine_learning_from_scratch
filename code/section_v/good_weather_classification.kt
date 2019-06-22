@@ -50,7 +50,7 @@ fun giniImpurityForSplit(feature: Feature, splitValue: Double, samples: List<Wea
 
 fun splitContinuousVariable(feature: Feature, samples: List<WeatherItem>): Double? {
 
-    val featureValues = samples.asSequence().map { feature.mapper(it) }.distinct().toList()
+    val featureValues = samples.asSequence().map { feature.mapper(it) }.distinct().toList().sorted()
 
     val bestSplit = featureValues.asSequence().zipWithNext { value1, value2 -> (value1 + value2) / 2.0 }
             .minBy { giniImpurityForSplit(feature, it, samples) }
@@ -87,8 +87,11 @@ class TreeLeaf(val feature: Feature,
 
     val giniImpurity = giniImpurityForSplit(feature, splitValue, samples)
 
-    val featurePositiveLeaf: TreeLeaf? = buildLeaf(samples.filter { feature.mapper(it) >= splitValue }, this)
-    val featureNegativeLeaf: TreeLeaf? = buildLeaf(samples.filter { feature.mapper(it) < splitValue }, this)
+    val positiveItems = samples.filter { feature.mapper(it) >= splitValue }
+    val negativeItems = samples.filter { feature.mapper(it) < splitValue }
+
+    val featurePositiveLeaf: TreeLeaf? = buildLeaf(positiveItems, this)
+    val featureNegativeLeaf: TreeLeaf? = buildLeaf(negativeItems, this)
 
     fun predict(weatherItem: WeatherItem): Double {
 
@@ -105,8 +108,17 @@ class TreeLeaf(val feature: Feature,
             }
         }
     }
+    override fun toString() = "$feature split on $splitValue, ${negativeItems.count()}|${positiveItems.count()}, Impurity: $giniImpurity"
 }
 
+fun recurseAndPrintTree(leaf: TreeLeaf?, depth: Int = 0) {
+
+    if (leaf != null) {
+        println("\t".repeat(depth) + "($leaf)")
+        recurseAndPrintTree(leaf.featureNegativeLeaf, depth + 1)
+        recurseAndPrintTree(leaf.featurePositiveLeaf, depth + 1)
+    }
+}
 
 
 fun main() {
@@ -115,7 +127,9 @@ fun main() {
 
     val tree = buildLeaf(data)
 
-    val prediction = tree!!.predict(WeatherItem(rain=0.0, cloudy = 0.0, lightning = 0.0, temperature = 65.0))
+    recurseAndPrintTree(tree)
+
+    val prediction = tree!!.predict(WeatherItem(rain=0.0, lightning = 0.0, cloudy = 1.0, temperature = 76.0))
 
     if (prediction >= .5) {
         println("Weather is good: ${prediction * 100.0}% confident")

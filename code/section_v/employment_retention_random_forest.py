@@ -1,3 +1,5 @@
+import random
+
 import pandas as pd
 
 
@@ -85,7 +87,6 @@ class TreeLeaf:
         self.negative_leaf = build_leaf(self.negative_employees, self)
 
     def predict(self, employee):
-        print(self)
         feature_value = self.feature.value_extractor(employee)
         if feature_value >= self.split_value:
             if self.positive_leaf is None:
@@ -104,12 +105,17 @@ class TreeLeaf:
                                                                  len(self.negative_employees), self.gini_impurity)
 
 
-def build_leaf(sample_employees, previous_leaf):
+def build_leaf(sample_employees, previous_leaf = None, random_feature_count = None ):
     best_impurity = 1.0
     best_split = None
     best_feature = None
 
-    for feature in features:
+    if random_feature_count is not None:
+        sample_features = random.sample(features, random_feature_count)
+    else:
+        sample_features = features
+
+    for feature in sample_features:
         split_value = split_continuous_variable(feature, sample_employees)
 
         if split_value is None:
@@ -128,22 +134,16 @@ def build_leaf(sample_employees, previous_leaf):
         return None
 
 
-tree = build_leaf(all_employees, None)
 
-
-def recurse_and_print_tree(leaf, depth=0):
-    if leaf is not None:
-        print(("\t" * depth) + "({0}) ".format(depth) + str(leaf))
-        recurse_and_print_tree(leaf.negative_leaf, depth + 1)
-        recurse_and_print_tree(leaf.positive_leaf, depth + 1)
-
-
-recurse_and_print_tree(tree)
-
+random_forest = [build_leaf(sample_employees=random.sample(all_employees, int(len(all_employees) * (2/3))), random_feature_count= random.choice(range(2,3))) for i in range(1,300)]
 
 # Interact and test with new employee data
 def predict_employee_will_stay(sex, age, promotions, years_employed):
-    probability_of_leaving = tree.predict(EmployeeRetention(sex, age, promotions, years_employed, 0))
+
+    emp = EmployeeRetention(sex, age, promotions, years_employed, 0)
+    will_leave_vote = sum(1 if tree.predict(emp) >= .5 else 0 for tree in random_forest)
+    probability_of_leaving = will_leave_vote / len(random_forest)
+
     if probability_of_leaving >= .5:
         return "WILL LEAVE, {0}% chance of leaving\r\n".format(round(probability_of_leaving * 100.0, 2))
     else:
