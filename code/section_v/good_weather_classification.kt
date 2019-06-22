@@ -96,11 +96,11 @@ class TreeLeaf(val feature: Feature,
 
         return when {
             featureValue >= splitValue -> when {
-                featurePositiveLeaf == null -> (goodWeatherItems.count { feature.mapper(it) >= splitValue }.toDouble() / samples.count().toDouble())
+                featurePositiveLeaf == null -> (goodWeatherItems.count { feature.mapper(it) >= splitValue }.toDouble() / samples.count { feature.mapper(it) >= splitValue }.toDouble() )
                 else -> featurePositiveLeaf.predict(weatherItem)
             }
             else -> when {
-                featureNegativeLeaf == null -> (goodWeatherItems.count { feature.mapper(it) < splitValue }.toDouble() / samples.count().toDouble())
+                featureNegativeLeaf == null -> (goodWeatherItems.count { feature.mapper(it) < splitValue }.toDouble() / samples.count { feature.mapper(it) < splitValue }.toDouble() )
                 else -> featureNegativeLeaf.predict(weatherItem)
             }
         }
@@ -122,8 +122,8 @@ fun main() {
     } else {
         println("Weather is bad: ${prediction * 100.0}% chance of it being good ")
     }
-    
- 
+
+
     // Random forest
 
 /*    val randomForest = (1..300).map { buildLeaf(samples = data.random((50 / 3) * 2), featureSampleSize = 2)!! }
