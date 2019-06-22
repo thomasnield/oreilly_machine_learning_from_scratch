@@ -62,7 +62,7 @@ data class FeatureAndSplit(val feature: Feature, val split: Double)
 
 fun buildLeaf(samples: List<WeatherItem>, previousLeaf: TreeLeaf? = null, featureSampleSize: Int? = null ): TreeLeaf? {
 
-    val featureAndSplit = (if (featureSampleSize == null) features else features.random(featureSampleSize) )
+    val fs = (if (featureSampleSize == null) features else features.random(featureSampleSize) )
             .asSequence()
             .filter { splitContinuousVariable(it, samples) != null }
             .map { feature ->
@@ -72,8 +72,8 @@ fun buildLeaf(samples: List<WeatherItem>, previousLeaf: TreeLeaf? = null, featur
             }
 
     return if (previousLeaf == null ||
-            (featureAndSplit != null && giniImpurityForSplit(featureAndSplit.feature, featureAndSplit.split, samples) < previousLeaf.giniImpurity))
-        TreeLeaf(featureAndSplit!!.feature, featureAndSplit.split, samples)
+            (fs != null && giniImpurityForSplit(fs.feature, fs.split, samples) < previousLeaf.giniImpurity))
+        TreeLeaf(fs!!.feature, fs.split, samples)
     else
         null
 }
@@ -96,11 +96,11 @@ class TreeLeaf(val feature: Feature,
 
         return when {
             featureValue >= splitValue -> when {
-                featurePositiveLeaf == null -> (goodWeatherItems.count().toDouble() / samples.count().toDouble())
+                featurePositiveLeaf == null -> (goodWeatherItems.count { feature.mapper(it) >= splitValue }.toDouble() / samples.count().toDouble())
                 else -> featurePositiveLeaf.predict(weatherItem)
             }
             else -> when {
-                featureNegativeLeaf == null -> (goodWeatherItems.count().toDouble() / samples.count().toDouble())
+                featureNegativeLeaf == null -> (goodWeatherItems.count { feature.mapper(it) < splitValue }.toDouble() / samples.count().toDouble())
                 else -> featureNegativeLeaf.predict(weatherItem)
             }
         }
@@ -115,27 +115,26 @@ fun main() {
 
     val tree = buildLeaf(data)
 
-    val prediction = tree!!.predict(WeatherItem(rain=1.0, cloudy = 0.0, lightning = 0.0, temperature = 75.0))
+    val prediction = tree!!.predict(WeatherItem(rain=0.0, cloudy = 0.0, lightning = 0.0, temperature = 65.0))
 
     if (prediction >= .5) {
         println("Weather is good: ${prediction * 100.0}% confident")
     } else {
         println("Weather is bad: ${prediction * 100.0}% chance of it being good ")
     }
-
+    
+ 
     // Random forest
-    /*
-    val randomForest = (1..300).map { buildLeaf(samples = data.random((50 / 3) * 2), featureSampleSize = 3)!! }
 
-    val input = WeatherItem(rain=0.0, cloudy = 0.0, lightning = 0.0, temperature = 76.0)
+/*    val randomForest = (1..300).map { buildLeaf(samples = data.random((50 / 3) * 2), featureSampleSize = 2)!! }
+
+    val input = WeatherItem(rain=0.0, cloudy = 1.0, lightning = 0.0, temperature = 81.0)
 
     val vote = randomForest.count { it.predict(input) >= .5 }
 
-
-    if (vote >= 300) {
-        println("Weather is good: ${vote}/600 votes")
+    if (vote >= 150) {
+        println("Weather is good: $vote/300 votes")
     } else {
-        println("Weather is bad:  ${vote}/600 votes")
-    }
-     */
+        println("Weather is bad:  $vote/300 votes")
+    }*/
 }
