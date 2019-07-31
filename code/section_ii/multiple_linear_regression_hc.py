@@ -59,4 +59,4 @@ for i in range(epochs):
         elif random_b == 2:
             b2 -= random_adjust
 
-print("y = {0} + {1}x1 + {2}x2".format(b0, b1, b2))
+print("z = {0} + {1}x + {2}y".format(b0, b1, b2))
