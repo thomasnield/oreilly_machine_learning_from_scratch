@@ -40,7 +40,7 @@ def predict_probability(sex, age, promotions, years_employed):
 
 for i in range(iterations):
 
-    # Select b0, b1, b2, or b3 randomly, and adjust it by a random amount
+    # Select b0, b1, b2, b3, or b4 randomly, and adjust it by a random amount
     random_b = random.choice(range(5))
 
     random_adjust = np.random.standard_normal()

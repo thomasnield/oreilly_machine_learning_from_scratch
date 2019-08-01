@@ -26,7 +26,7 @@ b1 = .01
 # calculate maximum likelihood
 
 def predict_probability(x):
-    p = 1.0 / (1.0 + math.exp(-(b0 + b1 * x)))
+    p = 1.0 / (1.0001 + math.exp(-(b0 + b1 * x)))
     return p
 
 
