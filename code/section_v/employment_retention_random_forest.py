@@ -79,30 +79,30 @@ class TreeLeaf:
         self.split_value = split_value
         self.sample_employees = sample_employees
         self.previous_leaf = previous_leaf
-        self.positive_employees = [e for e in sample_employees if feature.value_extractor(e) >= split_value]
-        self.negative_employees = [e for e in sample_employees if feature.value_extractor(e) < split_value]
-        self.gini_impurity = gini_impurity_for_split(feature, split_value, sample_employees)
+        self.feature_positive_employees = [e for e in sample_employees if feature.value_extractor(e) >= split_value]
+        self.feature_negative_employees = [e for e in sample_employees if feature.value_extractor(e) < split_value]
+        self.weighted_gini_impurity = gini_impurity_for_split(feature, split_value, sample_employees)
 
-        self.positive_leaf = build_leaf(self.positive_employees, self)
-        self.negative_leaf = build_leaf(self.negative_employees, self)
+        self.feature_positive_leaf = build_leaf(self.feature_positive_employees, self)
+        self.feature_negative_leaf = build_leaf(self.feature_negative_employees, self)
 
     def predict(self, employee):
         feature_value = self.feature.value_extractor(employee)
         if feature_value >= self.split_value:
-            if self.positive_leaf is None:
-                return sum(1 for e in self.positive_employees if e.did_quit == 1) / len(self.positive_employees)
+            if self.feature_positive_leaf is None:
+                return sum(1 for e in self.feature_positive_employees if e.did_quit == 1) / len(self.feature_positive_employees)
             else:
-                return self.positive_leaf.predict(employee)
+                return self.feature_positive_leaf.predict(employee)
         else:
-            if self.negative_leaf is None:
-                return sum(1 for e in self.negative_employees if e.did_quit == 1) / len(self.negative_employees)
+            if self.feature_negative_leaf is None:
+                return sum(1 for e in self.feature_negative_employees if e.did_quit == 1) / len(self.feature_negative_employees)
             else:
-                return self.negative_leaf.predict(employee)
+                return self.feature_negative_leaf.predict(employee)
 
     def __str__(self):
         return "{0} split on {1}, {3}|{2}, Impurity: {4}".format(self.feature, self.split_value,
-                                                                 len(self.positive_employees),
-                                                                 len(self.negative_employees), self.gini_impurity)
+                                                                 len(self.feature_positive_employees),
+                                                                 len(self.feature_negative_employees), self.weighted_gini_impurity)
 
 
 def build_leaf(sample_employees, previous_leaf = None, random_feature_count = None ):
@@ -121,6 +121,7 @@ def build_leaf(sample_employees, previous_leaf = None, random_feature_count = No
         if split_value is None:
             continue
 
+        # Keep track of best feature with lowest impurity
         impurity = gini_impurity_for_split(feature, split_value, sample_employees)
 
         if best_impurity > impurity:
@@ -128,7 +129,8 @@ def build_leaf(sample_employees, previous_leaf = None, random_feature_count = No
             best_feature = feature
             best_split = split_value
 
-    if previous_leaf is None or best_impurity < previous_leaf.gini_impurity:
+    # The gini impurity must be improved by the next best split, otherwise the branch ends here
+    if previous_leaf is None or best_impurity < gini_impurity(sample_employees):
         return TreeLeaf(best_feature, best_split, sample_employees, previous_leaf)
     else:
         return None

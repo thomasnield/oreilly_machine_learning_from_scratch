@@ -28,7 +28,7 @@ features = [Feature("Rain", lambda wi: wi.rain),
             Feature("Cloudy", lambda wi: wi.cloudy),
             Feature("Temperature", lambda wi: wi.temperature)]
 
-
+# get impurity for provided samples
 def gini_impurity(samples):
     good_weather_item_ct = sum(1 for weather_item in samples if weather_item.good_weather_ind == 1)
     bad_weather_item_ct = sum(1 for weather_item in samples if weather_item.good_weather_ind == 0)
@@ -37,6 +37,7 @@ def gini_impurity(samples):
     return 1.0 - (good_weather_item_ct / sample_ct) ** 2 - (bad_weather_item_ct / sample_ct) ** 2
 
 
+# get weighted impurity for entire
 def gini_impurity_for_split(feature, split_value, samples):
     feature_positive_items = [weather_item for weather_item in samples if feature.value_extractor(weather_item) >= split_value]
     feature_negative_items = [weather_item for weather_item in samples if feature.value_extractor(weather_item) < split_value]
@@ -72,31 +73,31 @@ class TreeLeaf:
         self.feature = feature
         self.split_value = split_value
         self.samples = samples
-        self.positive_items = [e for e in samples if feature.value_extractor(e) >= split_value]
-        self.negative_items = [e for e in samples if feature.value_extractor(e) < split_value]
-        self.gini_impurity = gini_impurity_for_split(feature, split_value, samples)
+        self.feature_positive_items = [e for e in samples if feature.value_extractor(e) >= split_value]
+        self.feature_negative_items = [e for e in samples if feature.value_extractor(e) < split_value]
+        self.weighted_gini_impurity = gini_impurity_for_split(feature, split_value, samples)
 
-        self.positive_leaf = build_leaf(self.positive_items, self)
-        self.negative_leaf = build_leaf(self.negative_items, self)
+        self.feature_positive_leaf = build_leaf(self.feature_positive_items, self)
+        self.feature_negative_leaf = build_leaf(self.feature_negative_items, self)
 
     def predict(self, weather_item):
         print(self)
         feature_value = self.feature.value_extractor(weather_item)
         if feature_value >= self.split_value:
-            if self.positive_leaf is None:
-                return sum(1 for e in self.positive_items if e.good_weather_ind == 1) / len(self.positive_items)
+            if self.feature_positive_leaf is None:
+                return sum(1 for e in self.feature_positive_items if e.good_weather_ind == 1) / len(self.feature_positive_items)
             else:
-                return self.positive_leaf.predict(weather_item)
+                return self.feature_positive_leaf.predict(weather_item)
         else:
-            if self.negative_leaf is None:
-                return sum(1 for e in self.negative_items if e.good_weather_ind == 1) / len(self.negative_items)
+            if self.feature_negative_leaf is None:
+                return sum(1 for e in self.feature_negative_items if e.good_weather_ind == 1) / len(self.feature_negative_items)
             else:
-                return self.negative_leaf.predict(weather_item)
+                return self.feature_negative_leaf.predict(weather_item)
 
     def __str__(self):
         return "{0} split on {1}, {3}|{2}, Impurity: {4}".format(self.feature, self.split_value,
-                                                                 len(self.positive_items),
-                                                                 len(self.negative_items), self.gini_impurity)
+                                                                 len(self.feature_positive_items),
+                                                                 len(self.feature_negative_items), self.weighted_gini_impurity)
 
 
 def build_leaf(sample_employees, previous_leaf):
@@ -104,20 +105,24 @@ def build_leaf(sample_employees, previous_leaf):
     best_split = None
     best_feature = None
 
+    # Find feature with lowest impurity
     for feature in features:
         split_value = split_continuous_variable(feature, sample_employees)
 
+        # If value cannot be split, skip
         if split_value is None:
             continue
 
         impurity = gini_impurity_for_split(feature, split_value, sample_employees)
 
+        # Keep track of best feature with lowest impurity
         if best_impurity > impurity:
             best_impurity = impurity
             best_feature = feature
             best_split = split_value
 
-    if previous_leaf is None or best_impurity < previous_leaf.gini_impurity:
+    # The gini impurity must be improved by the next best split, otherwise the branch ends here
+    if previous_leaf is None or gini_impurity(sample_employees) > best_impurity:
         return TreeLeaf(best_feature, best_split, sample_employees)
     else:
         return None
@@ -129,8 +134,8 @@ tree = build_leaf(all_samples, None)
 def recurse_and_print_tree(leaf, depth=0):
     if leaf is not None:
         print(("\t" * depth) + "({0}) ".format(depth) + str(leaf))
-        recurse_and_print_tree(leaf.negative_leaf, depth + 1)
-        recurse_and_print_tree(leaf.positive_leaf, depth + 1)
+        recurse_and_print_tree(leaf.feature_negative_leaf, depth + 1)
+        recurse_and_print_tree(leaf.feature_positive_leaf, depth + 1)
 
 
 recurse_and_print_tree(tree)
