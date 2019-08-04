@@ -121,7 +121,7 @@ def build_leaf(sample_colors, previous_leaf):
             best_feature = feature
             best_split = split_value
 
-    if previous_leaf is None or best_impurity < previous_leaf.gini_impurity:
+    if previous_leaf is None or best_impurity < gini_impurity(sample_colors):
         return TreeLeaf(best_feature, best_split, sample_colors, previous_leaf)
     else:
         return None
