@@ -42,18 +42,15 @@ best_loss = 10_000_000_000
 for i in range(1_000_000):
 
     # 32 hyperparameters to randomly select from
-    # We randomly select one by choosing a random index
     random_select = np.random.randint(0, 32)
     random_adjust = np.random.normal() * learning_rate
     random_row = 0
     random_col = 0
 
-    # Randomly adjust a weight in input layer
     if random_select < 9:
         random_row = np.random.randint(0, 3)
         random_col = np.random.randint(0, 3)
 
-        # Make sure adjustment doesn't cause weight to exceed -1.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < -1.0:
             random_adjust = -1.0 - input_weights[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -61,12 +58,10 @@ for i in range(1_000_000):
 
         input_weights[random_row, random_col] += random_adjust
 
-    # Randomly adjust a weight in middle layer
     elif random_select < 18:
         random_row = np.random.randint(0, 3)
         random_col = np.random.randint(0, 3)
 
-        # Make sure adjustment doesn't cause weight to exceed -1.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < -1.0:
             random_adjust = -1.0 - middle_weights[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -74,12 +69,10 @@ for i in range(1_000_000):
 
         middle_weights[random_row, random_col] += random_adjust
 
-    # Randomly adjust a weight in outer layer
     elif random_select < 24:
-        random_row = np.random.randint(0,2)
-        random_col = np.random.randint(0,3)
+        random_row = np.random.randint(2)
+        random_col = np.random.randint(3)
 
-        # Make sure adjustment doesn't cause weight to exceed -1.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < -1.0:
             random_adjust = -1.0 - output_weights[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -87,12 +80,10 @@ for i in range(1_000_000):
 
         output_weights[random_row, random_col] += random_adjust
 
-    # Randomly adjust a bias in input layer
     elif random_select < 27:
-        random_row = np.random.randint(0,3)
+        random_row = np.random.randint(3)
         random_col = 0
 
-        # Make sure adjustment doesn't cause bias to exceed 0.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < 0.0:
             random_adjust = 0.0 - input_bias[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -100,12 +91,10 @@ for i in range(1_000_000):
 
         input_bias[random_row, random_col] += random_adjust
 
-    # Randomly adjust a bias in middle layer
     elif random_select < 30:
-        random_row = np.random.randint(0,3)
+        random_row = np.random.randint(3)
         random_col = 0
 
-        # Make sure adjustment doesn't cause bias to exceed 0.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < 0.0:
             random_adjust = 0.0 - middle_bias[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -113,12 +102,10 @@ for i in range(1_000_000):
 
         middle_bias[random_row, random_col] += random_adjust
 
-    # Randomly adjust a bias in outer layer
     elif random_select < 32:
-        random_row = np.random.randint(0,2)
+        random_row = np.random.randint(2)
         random_col = 0
 
-        # Make sure adjustment doesn't cause bias to exceed 0.0 and 1.0
         if input_weights[random_row, random_col] + random_adjust < 0.0:
             random_adjust = 0.0 - output_bias[random_row, random_col]
         if input_weights[random_row, random_col] + random_adjust > 1.0:
@@ -132,8 +119,8 @@ for i in range(1_000_000):
 
     if mean_loss < best_loss:
         best_loss = mean_loss
+        print(best_loss)
 
-    # If loss does not improve, undo the adjustment
     elif random_select < 9:
         input_weights[random_row, random_col] -= random_adjust
 
