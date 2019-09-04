@@ -1,10 +1,11 @@
+import numpy as np
 
 
+input_weights = np.zeros([2,3])
+input_bias = np.array([1,2,3])
 
-feature_values = [0,2,4,6,8]
-feature_values2 = feature_values.copy()
-feature_values2.pop(0)
+print(input_weights + input_bias)
 
-zip_avgs = [(zipped[0] + zipped[1]) / 2 for zipped in zip(feature_values, feature_values2)]
+input_weights[0] += 10000
 
-print(zip_avgs)
+print(input_weights)
