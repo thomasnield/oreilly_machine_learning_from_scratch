@@ -5,6 +5,8 @@ from scipy import special
 training_data = pd.read_csv("https://tinyurl.com/y2qmhfsr")
 training_data_count = len(training_data.index)
 
+learning_rate = 0.1
+
 # Extract the input columns
 training_inputs = training_data.iloc[:, 0:3].values.transpose() / 255
 
@@ -41,38 +43,74 @@ for i in range(1_000_000):
 
     # 32 hyperparameters to randomly select from
     random_select = np.random.randint(0, 32)
-    random_adjust = np.random.normal()
+    random_adjust = np.random.normal() * learning_rate
     random_row = 0
     random_col = 0
 
     if random_select < 9:
         random_row = np.random.randint(0, 3)
         random_col = np.random.randint(0, 3)
+
+        if input_weights[random_row, random_col] + random_adjust < -1.0:
+            random_adjust = -1.0 - input_weights[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - input_weights[random_row, random_col]
+
         input_weights[random_row, random_col] += random_adjust
 
     elif random_select < 18:
         random_row = np.random.randint(0, 3)
         random_col = np.random.randint(0, 3)
+
+        if input_weights[random_row, random_col] + random_adjust < -1.0:
+            random_adjust = -1.0 - middle_weights[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - middle_weights[random_row, random_col]
+
         middle_weights[random_row, random_col] += random_adjust
 
     elif random_select < 24:
         random_row = np.random.randint(2)
         random_col = np.random.randint(3)
+
+        if input_weights[random_row, random_col] + random_adjust < -1.0:
+            random_adjust = -1.0 - output_weights[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - output_weights[random_row, random_col]
+
         output_weights[random_row, random_col] += random_adjust
 
     elif random_select < 27:
         random_row = np.random.randint(3)
         random_col = 0
+
+        if input_weights[random_row, random_col] + random_adjust < 0.0:
+            random_adjust = 0.0 - input_bias[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - input_bias[random_row, random_col]
+
         input_bias[random_row, random_col] += random_adjust
 
     elif random_select < 30:
         random_row = np.random.randint(3)
         random_col = 0
+
+        if input_weights[random_row, random_col] + random_adjust < 0.0:
+            random_adjust = 0.0 - middle_bias[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - middle_bias[random_row, random_col]
+
         middle_bias[random_row, random_col] += random_adjust
 
     elif random_select < 32:
         random_row = np.random.randint(2)
         random_col = 0
+
+        if input_weights[random_row, random_col] + random_adjust < 0.0:
+            random_adjust = 0.0 - output_bias[random_row, random_col]
+        if input_weights[random_row, random_col] + random_adjust > 1.0:
+            random_adjust = 1.0 - output_bias[random_row, random_col]
+
         output_bias[random_row, random_col] += random_adjust
 
     training_outputs = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(relu(input_bias + input_weights.dot(training_inputs))))))
@@ -106,10 +144,11 @@ for i in range(1_000_000):
 def predict_probability(r, g, b):
     input_colors = np.array([r,g,b]).transpose() / 255
     output = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(relu(input_bias + input_weights.dot(input_colors))))))
-    return output[0,0]
+    return output
 
 def predict_font_shade(r, g, b):
-    if predict_probability(r, g, b) >= .5:
+    output_values = predict_probability(r, g, b)
+    if output_values[0,0] > output_values[1,0]:
         return "DARK"
     else:
         return "LIGHT"
