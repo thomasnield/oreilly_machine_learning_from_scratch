@@ -39,17 +39,40 @@ def softmax(x):
 for i in range(10000):
 
     # 32 hyperparameters to randomly select from
-
     random_select = np.random.randint(0, 32)
     random_adjust = np.random.normal()
+    random_row = 0
+    random_col = 0
 
     if random_select < 9:
-        input_weights[random_select] += random_adjust
-    elif random_select < 18:
-        middle_weights[random_select - 9] += random_adjust
-    elif random_select < 24:
-        middle_weights[random_select - 18] += random_adjust
+        random_row = np.random.randint(0, 3)
+        random_col = np.random.randint(0, 3)
+        input_weights[random_row, random_col] += random_adjust
 
+    elif random_select < 18:
+        random_row = np.random.randint(0, 3)
+        random_col = np.random.randint(0, 3)
+        middle_weights[random_row, random_col] += random_adjust
+
+    elif random_select < 24:
+        random_row = np.random.randint(2)
+        random_col = np.random.randint(3)
+        output_weights[random_row, random_col] += random_adjust
+
+    elif random_select < 27:
+        random_row = np.random.randint(3)
+        random_col = 0
+        input_bias[random_row, random_col] += random_adjust
+
+    elif random_select < 30:
+        random_row = np.random.randint(3)
+        random_col = 0
+        middle_bias[random_row, random_col] += random_adjust
+
+    elif random_select < 32:
+        random_row = np.random.randint(2)
+        random_col = 0
+        output_bias[random_row, random_col] += random_adjust
 
     training_outputs = softmax(output_bias + output_weights.dot(relu(middle_bias + middle_weights.dot(input_bias + input_weights.dot(input_colors)))))
 
