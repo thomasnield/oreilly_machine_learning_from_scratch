@@ -2,17 +2,17 @@ import numpy as np
 import pandas as pd
 from scipy import special
 
-training_colors = pd.read_csv("https://tinyurl.com/y2qmhfsr")
-training_colors_count = len(training_colors.index)
+training_data = pd.read_csv("https://tinyurl.com/y2qmhfsr")
+training_data_count = len(training_data.index)
 
 # Extract the input columns
-input_colors = training_colors.iloc[:, 0:3].values.transpose()
+training_inputs = training_data.iloc[:, 0:3].values.transpose() / 255
 
 # Extract output column, and generate an opposite column where 1 is 0 and 0 is 1.
 actual_outputs = np.vstack(
-    (training_colors.iloc[:, -1].values.transpose(), -1 * (training_colors.iloc[:, -1].values.transpose() - 1)))
+    (training_data.iloc[:, -1].values.transpose(), -1 * (training_data.iloc[:, -1].values.transpose() - 1)))
 
-# Build neural network
+# Build neural network with weights and biases
 input_weights = np.random.rand(3, 3)
 middle_weights = np.random.rand(3, 3)
 output_weights = np.random.rand(2, 3)
@@ -34,9 +34,10 @@ def relu(x):
 def softmax(x):
     return special.softmax(x, axis=0)
 
+best_loss = 10_000_000_000
 
 # Execute training with hill-climbing
-for i in range(10000):
+for i in range(1_000_000):
 
     # 32 hyperparameters to randomly select from
     random_select = np.random.randint(0, 32)
@@ -74,7 +75,46 @@ for i in range(10000):
         random_col = 0
         output_bias[random_row, random_col] += random_adjust
 
-    training_outputs = softmax(output_bias + output_weights.dot(relu(middle_bias + middle_weights.dot(input_bias + input_weights.dot(input_colors)))))
+    training_outputs = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(relu(input_bias + input_weights.dot(training_inputs))))))
 
-    mean_loss = np.sum((actual_outputs - training_outputs) ** 2) / training_colors_count
+    mean_loss = np.sum((actual_outputs - training_outputs) ** 2) / training_data_count
 
+    if mean_loss < best_loss:
+        best_loss = mean_loss
+        print(best_loss)
+
+    elif random_select < 9:
+        input_weights[random_row, random_col] -= random_adjust
+
+    elif random_select < 18:
+        middle_weights[random_row, random_col] -= random_adjust
+
+    elif random_select < 24:
+        output_weights[random_row, random_col] -= random_adjust
+
+    elif random_select < 27:
+        input_bias[random_row, random_col] -= random_adjust
+
+    elif random_select < 30:
+        middle_bias[random_row, random_col] -= random_adjust
+
+    elif random_select < 32:
+        output_bias[random_row, random_col] -= random_adjust
+
+
+# Interact and test with new colors
+def predict_probability(r, g, b):
+    input_colors = np.array([r,g,b]).transpose() / 255
+    output = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(relu(input_bias + input_weights.dot(input_colors))))))
+    return output[0,0]
+
+def predict_font_shade(r, g, b):
+    if predict_probability(r, g, b) >= .5:
+        return "DARK"
+    else:
+        return "LIGHT"
+
+while True:
+    n = input("Predict light or dark font. Input values R,G,B: ")
+    (r, g, b) = n.split(",")
+    print(predict_font_shade(int(r), int(g), int(b)))
