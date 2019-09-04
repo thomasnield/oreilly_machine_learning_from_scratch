@@ -70,8 +70,8 @@ for i in range(1_000_000):
         middle_weights[random_row, random_col] += random_adjust
 
     elif random_select < 24:
-        random_row = np.random.randint(2)
-        random_col = np.random.randint(3)
+        random_row = np.random.randint(0,2)
+        random_col = np.random.randint(0,3)
 
         if input_weights[random_row, random_col] + random_adjust < -1.0:
             random_adjust = -1.0 - output_weights[random_row, random_col]
@@ -81,7 +81,7 @@ for i in range(1_000_000):
         output_weights[random_row, random_col] += random_adjust
 
     elif random_select < 27:
-        random_row = np.random.randint(3)
+        random_row = np.random.randint(0,3)
         random_col = 0
 
         if input_weights[random_row, random_col] + random_adjust < 0.0:
@@ -92,7 +92,7 @@ for i in range(1_000_000):
         input_bias[random_row, random_col] += random_adjust
 
     elif random_select < 30:
-        random_row = np.random.randint(3)
+        random_row = np.random.randint(0,3)
         random_col = 0
 
         if input_weights[random_row, random_col] + random_adjust < 0.0:
@@ -103,7 +103,7 @@ for i in range(1_000_000):
         middle_bias[random_row, random_col] += random_adjust
 
     elif random_select < 32:
-        random_row = np.random.randint(2)
+        random_row = np.random.randint(0,2)
         random_col = 0
 
         if input_weights[random_row, random_col] + random_adjust < 0.0:
