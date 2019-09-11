@@ -7,7 +7,7 @@ training_data_count = len(training_data.index)
 
 learning_rate = 0.1
 
-# Extract the input columns
+# Extract the input columns, scale down by 255
 training_inputs = training_data.iloc[:, 0:3].values.transpose() / 255
 
 # Extract output column, and generate an opposite column where 1 is 0 and 0 is 1.
@@ -28,10 +28,8 @@ output_bias = np.random.rand(2, 1)
 def tanh(x):
     return np.tanh(x)
 
-
 def relu(x):
     return np.maximum(x, 0)
-
 
 def softmax(x):
     return special.softmax(x, axis=0)
