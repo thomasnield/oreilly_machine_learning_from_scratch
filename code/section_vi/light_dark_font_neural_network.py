@@ -5,6 +5,9 @@ from scipy import special
 training_data = pd.read_csv("https://tinyurl.com/y2qmhfsr")
 training_data_count = len(training_data.index)
 
+# Learning rate controls how slowly we approach a solution
+# Make it too small, it will take too long to run.
+# Make it too big, it will likely overshoot and miss the solution.
 learning_rate = 0.1
 
 # Extract the input columns, scale down by 255
