@@ -35,6 +35,7 @@ for i in range(iterations):
 
     probabilities = 1.0 / (1.0 + np.exp(-1.0 * training_inputs.dot(betas)))
 
+    # Calculate the likelihood. If it improves, keep the random moves. Otherwise revert.
     true_likelihood = (np.log(probabilities) * training_outputs).sum()
     false_likelihood = (np.log(1.00001 - probabilities) * ((training_outputs - 1) **2)).sum()
 
