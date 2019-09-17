@@ -26,9 +26,6 @@ output_bias = np.random.rand(2, 1)
 
 
 # Activation functions
-def tanh(x):
-    return np.tanh(x)
-
 
 def relu(x):
     return np.maximum(x, 0)
