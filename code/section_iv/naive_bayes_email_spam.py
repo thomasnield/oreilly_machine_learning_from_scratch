@@ -1,6 +1,5 @@
-import re
-
 import math
+import re
 
 
 class Email:
@@ -14,6 +13,8 @@ emails = [
     Email("Get viagra for a discount as much as 90%", True),
     Email("Viagra prescription for less", True),
     Email("Even better than Viagra, try this new prescription drug", True),
+    Email("My name is Natasha, I want to meet you", True),
+    Email("Meet the hottest singles on the #1 dating site", True),
 
     Email("Hey, I left my phone at home. Email me if you need anything. I'll be in a meeting for the afternoon.",
           False),

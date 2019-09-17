@@ -1,6 +1,6 @@
+import math
 import random
 
-import math
 import numpy as np
 import pandas as pd
 
@@ -42,11 +42,13 @@ for i in range(1_000_000):
     elif random_b == 1:
         b1 += random_adjust
 
+    # Calculate total likelihood
     true_estimates = sum(math.log(predict_probability(p.x)) for p in points if p.y == 1.0)
     false_estimates = sum(math.log(1.0 - predict_probability(p.x)) for p in points if p.y == 0.0)
 
     total_likelihood = true_estimates + false_estimates
 
+    # If likelihood improves, keep the random adjustment. Otherwise revert.
     if best_likelihood < total_likelihood:
         best_likelihood = total_likelihood
     elif random_b == 0:

@@ -1,6 +1,6 @@
+import math
 import re
 
-import math
 import pandas as pd
 
 
@@ -61,22 +61,22 @@ def probability_for_category(memo, category):
     def category_score_for_memo(memo):
         message_words = break_up_words(memo)
 
-        total_spam_probability = 0.0
+        total_positive_probability = 0.0
         for w in all_word_counts:
             if w in message_words:
-                total_spam_probability += math.log(prob_word_appears_in_category(w))
+                total_positive_probability += math.log(prob_word_appears_in_category(w))
             else:
-                total_spam_probability += math.log(1.0 - prob_word_not_appears_in_category(w))
+                total_positive_probability += math.log(1.0 - prob_word_not_appears_in_category(w))
 
-        total_not_spam_probability = 0.0
+        total_negative_probability = 0.0
         for w in all_word_counts:
             if w in message_words:
-                total_not_spam_probability += math.log(prob_word_not_appears_in_category(w))
+                total_negative_probability += math.log(prob_word_not_appears_in_category(w))
             else:
-                total_not_spam_probability += math.log(1.0 - prob_word_not_appears_in_category(w))
+                total_negative_probability += math.log(1.0 - prob_word_not_appears_in_category(w))
 
-        return math.exp(total_spam_probability) / (
-                math.exp(total_spam_probability) + math.exp(total_not_spam_probability))
+        return math.exp(total_positive_probability) / (
+                math.exp(total_positive_probability) + math.exp(total_negative_probability))
 
     return category_score_for_memo(memo)
 

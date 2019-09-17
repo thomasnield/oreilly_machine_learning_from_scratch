@@ -111,10 +111,13 @@ for i in range(1_000_000):
 
         output_bias[random_row, random_col] += random_adjust
 
+    # Calculate outputs with the given weights, biases, and activation functions for all three layers
     training_outputs = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(relu(input_bias + input_weights.dot(training_inputs))))))
 
+    # Calculate the mean squared loss
     mean_loss = np.sum((actual_outputs - training_outputs) ** 2) / training_data_count
 
+    # If the loss improves, keep the random adjustment. Otherwise revert.
     if mean_loss < best_loss:
         best_loss = mean_loss
         print(best_loss)
