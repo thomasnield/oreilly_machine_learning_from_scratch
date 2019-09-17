@@ -38,6 +38,10 @@ def softmax(x):
 best_loss = 10_000_000_000
 
 # Execute training with hill-climbing
+# Please note that since neural networks have more than one local minimum,
+# Hill-climbing may produce an unreliable result, and we need to learn 
+# techniques like simulated annealing and stochastic gradient descent 
+# which is covered in another online training "Intro to Mathematical Optimization"
 for i in range(1_000_000):
 
     # 20 hyper-parameters to randomly select from
