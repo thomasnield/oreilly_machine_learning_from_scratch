@@ -122,7 +122,7 @@ for i in range(1_000_000):
         middle_bias[random_row, random_col] -= random_adjust
 
     elif random_select < 20:
-        middle_weights[random_row, random_col] -= random_adjust
+        output_bias[random_row, random_col] -= random_adjust
 
 
 # Interact and test with new colors
