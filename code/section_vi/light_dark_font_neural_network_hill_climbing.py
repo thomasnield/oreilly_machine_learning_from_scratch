@@ -30,10 +30,11 @@ output_bias = np.random.rand(2, 1)
 def relu(x):
     return np.maximum(x, 0)
 
-
 def softmax(x):
     return special.softmax(x, axis=0)
 
+def tanh(x):
+    return np.tanh(x)
 
 best_loss = 10_000_000_000
 
@@ -101,7 +102,7 @@ for i in range(1_000_000):
         output_bias[random_row, random_col] += random_adjust
 
     # Calculate outputs with the given weights, biases, and activation functions for all three layers
-    training_outputs = softmax(output_bias + output_weights.dot(relu(middle_bias + middle_weights.dot(training_inputs))))
+    training_outputs = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(training_inputs))))
 
     # Calculate the mean squared loss
     mean_loss = np.sum((actual_outputs - training_outputs) ** 2) / training_data_count
@@ -128,7 +129,7 @@ for i in range(1_000_000):
 # Interact and test with new colors
 def predict_probability(r, g, b):
     input_colors = np.array([r, g, b]).transpose() / 255
-    output = softmax(output_bias + output_weights.dot(relu(middle_bias + middle_weights.dot(input_colors))))
+    output = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(input_colors))))
     return output
 
 
