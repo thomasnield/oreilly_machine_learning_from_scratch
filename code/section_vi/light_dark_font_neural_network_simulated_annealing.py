@@ -150,7 +150,7 @@ for i in range(epochs):
         middle_bias[random_row, random_col] -= random_adjust
 
     elif random_select < 20:
-        middle_weights[random_row, random_col] -= random_adjust
+        output_bias[random_row, random_col] -= random_adjust
 
 
 # Set best solution
