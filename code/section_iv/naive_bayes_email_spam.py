@@ -1,5 +1,6 @@
 import math
 import re
+from collections import defaultdict
 
 
 class Email:
@@ -35,27 +36,27 @@ def break_up_words(str):
 
 
 # get count of words for spam emails
-spam_count_by_word = dict()
+spam_count_by_word = defaultdict(int)
 
 for email in emails:
     if email.is_spam:
         for word in break_up_words(email.message):
-            spam_count_by_word[word] = spam_count_by_word.get(word, 0) + 1
+            spam_count_by_word[word] += 1
 
 # get count of words for non-spam emails
-non_spam_count_by_word = dict()
+non_spam_count_by_word = defaultdict(int)
 
 for email in emails:
     if not email.is_spam:
         for word in break_up_words(email.message):
-            non_spam_count_by_word[word] = non_spam_count_by_word.get(word, 0) + 1
+            non_spam_count_by_word[word] += 1
 
 # get count of words in all emails
-all_emails_count_by_word = dict()
+all_emails_count_by_word = defaultdict(int)
 
 for email in emails:
     for word in break_up_words(email.message):
-        all_emails_count_by_word[word] = all_emails_count_by_word.get(word, 0) + 1
+        all_emails_count_by_word[word] += 1
 
 
 # Create functions to calculate probability of word occurring in spam or not spam
