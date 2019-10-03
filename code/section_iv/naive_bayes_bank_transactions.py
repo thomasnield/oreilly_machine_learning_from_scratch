@@ -2,6 +2,7 @@ import math
 import re
 
 import pandas as pd
+from collections import defaultdict
 
 
 class BankTransaction:
@@ -28,26 +29,26 @@ def probability_for_category(memo, category):
     negative_word_count = sum(1 for transaction in bank_transactions if transaction.category != category)
 
     # Get count of words that occurred in this category
-    positive_word_counts = dict()
+    positive_word_counts = defaultdict(int)
 
     for transaction in bank_transactions:
         if transaction.category == category:
             for word in break_up_words(transaction.memo):
-                positive_word_counts[word] = positive_word_counts.get(word, 0) + 1
+                positive_word_counts[word] += 1
 
     # Get count of words that did not occur in this category
-    negative_word_counts = dict()
+    negative_word_counts = defaultdict(int)
     for transaction in bank_transactions:
         if transaction.category != category:
             for word in break_up_words(transaction.memo):
-                negative_word_counts[word] = negative_word_counts.get(word, 0) + 1
+                negative_word_counts[word] += 1
 
     # get count of words in all transactions
-    all_word_counts = dict()
+    all_word_counts = defaultdict(int)
 
     for transaction in bank_transactions:
         for word in break_up_words(transaction.memo):
-            all_word_counts[word] = all_word_counts.get(word, 0) + 1
+            all_word_counts[word] += 1
 
     # Create functions to calculate probability of word occurring in category or not
     # add a little .1 and .2 to numerator/denominator respectively to prevent 0 division
