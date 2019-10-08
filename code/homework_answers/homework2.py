@@ -1,47 +1,56 @@
 import random
 
 import math
-import numpy as np
 import pandas as pd
+import numpy as np
 from numpy import log, exp
 
 
-class EmployeeRetention:
-    def __init__(self, sex, age, promotions, years_employed, did_quit):
-        self.sex = sex
-        self.age = age
-        self.promotions = promotions
-        self.years_employed = years_employed
-        self.did_quit = did_quit
+class LabeledColor:
+    def __init__(self, red, green, blue, dark_font_ind):
+        self.red = red / 255.0
+        self.green = green / 255.0
+        self.blue = blue / 255.0
+        self.dark_font_ind = dark_font_ind
+
+    def __str__(self):
+        return "{0},{1},{2}: {3}".format(self.red, self.green, self.blue, self.dark_font_ind)
 
 
-employee_data = [(EmployeeRetention(row[0], row[1], row[2], row[3], row[4])) for index, row in
-                 pd.read_csv("https://tinyurl.com/y6r7qjrp").iterrows()]
+training_colors = [(LabeledColor(row[0], row[1], row[2], row[3])) for index, row in
+                   pd.read_csv("https://tinyurl.com/y2qmhfsr").iterrows()]
 
+training_dark_colors = [c for c in training_colors if c.dark_font_ind == 1.0]
+training_light_colors = [c for c in training_colors if c.dark_font_ind == 0.0]
 
 best_likelihood = -100_000_000_000.0
-b0 = 1.0  # constant
-b1 = 1.0  # sex beta
-b2 = 1.0  # age beta
-b3 = 1.0  # promotions beta
-b4 = 1.0  # years employed beta
+b0 = 1.0 # constant
+b1 = 1.0 # red beta
+b2 = 1.0  # green beta
+b3 = 1.0  # blue beta
 
 iterations = 50_000
 
 
 # calculate maximum likelihood
 
-def predict_probability(sex, age, promotions, years_employed):
-    x = b0 + (b1 * sex) + (b2 * age) + (b3 * promotions) + (b4 * years_employed)
-    odds = exp(-x)
+# Closer to true (1.0) recommends dark font, closer to false (0.0) recommends light font
+def predict_probability(red, green, blue):
+    x = round(-(b0 + (b1 * red) + (b2 * green) + (b3 * blue)), 4)
+    odds = exp(x)
     p = 1.0 / (1.0 + odds)
     return p
 
 
 for i in range(iterations):
 
-    # Select b0, b1, b2, b3, or b4 randomly, and adjust it by a random amount
-    random_b = random.choice(range(5))
+    if i % 1000 == 0:
+        print("ITERATION: {0}, likelihood: {5}: f(x) ~ 1.0 / (1 + exp(-({1} + {2}*r + {3}*g + {4}*b))".format(i, b0, b1,
+                                                                                                              b2, b3,
+                                                                                                              math.exp(best_likelihood)))
+
+    # Select b0, b1, b2, or b3 randomly, and adjust it by a random amount
+    random_b = random.choice(range(4))
 
     random_adjust = np.random.standard_normal()
 
@@ -53,21 +62,20 @@ for i in range(iterations):
         b2 += random_adjust
     elif random_b == 3:
         b3 += random_adjust
-    elif random_b == 4:
-        b4 += random_adjust
+
 
     # calculate new likelihood
     # Use logarithmic addition to avoid multiplication and decimal underflow
     new_likelihood = 0.0
 
-    for emp in employee_data:
+    for c in training_colors:
 
-        probability = predict_probability(emp.sex, emp.age, emp.promotions, emp.years_employed)
+        probability = predict_probability(c.red, c.green, c.blue)
 
-        if emp.did_quit == 1:
+        if c.dark_font_ind == 1:
             new_likelihood += log(probability)
         else:
-            new_likelihood += log(1.00001 - probability)
+            new_likelihood += log(1.0 - probability)
 
     # If solution improves, keep it and make it new best likelihood. Otherwise undo the adjustment
     if best_likelihood < new_likelihood:
@@ -80,24 +88,21 @@ for i in range(iterations):
         b2 -= random_adjust
     elif random_b == 3:
         b3 -= random_adjust
-    elif random_b == 4:
-        b4 -= random_adjust
 
 # Print best result
-print("1.0 / (1 + exp(-({0} + {1}*s + {2}*a + {3}*p + {4}*y))".format(b0, b1, b2, b3, b4))
+print("1.0 / (1 + exp(-({0} + {1}*r + {2}*g + {3}*b))".format(b0, b1, b2, b3))
 print("BEST LIKELIHOOD: {0}".format(math.exp(best_likelihood)))
 
 
-# Interact and test with new employee data
-def predict_employee_will_stay(sex, age, promotions, years_employed):
-    probability_of_leaving = predict_probability(sex, age, promotions, years_employed)
-    if probability_of_leaving >= .5:
-        return "WILL LEAVE, {0}% chance of leaving".format(round(probability_of_leaving * 100.0,2))
+# Interact and test with new colors
+def predict_font_shade(r, g, b):
+    if predict_probability(r, g, b) >= .5:
+        return "DARK"
     else:
-        return "WILL STAY, {0}% chance of leaving".format(round(probability_of_leaving * 100.0,2))
+        return "LIGHT"
 
 
 while True:
-    n = input("Predict employee will stay or leave {sex},{age},{promotions},{years employed}: ")
-    (sex, age, promotions, years_employed) = n.split(",")
-    print(predict_employee_will_stay(int(sex), int(age), int(promotions), int(years_employed)))
+    n = input("Predict light or dark font. Input values R,G,B: ")
+    (r, g, b) = n.split(",")
+    print(predict_font_shade(int(r), int(g), int(b)))
