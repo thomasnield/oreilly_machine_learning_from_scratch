@@ -37,7 +37,7 @@ def gini_impurity(samples):
     return 1.0 - (good_weather_item_ct / sample_ct) ** 2 - (bad_weather_item_ct / sample_ct) ** 2
 
 
-# get weighted impurity for entire
+# get weighted impurity for entire node
 def gini_impurity_for_split(feature, split_value, samples):
     feature_positive_items = [weather_item for weather_item in samples if feature.value_extractor(weather_item) >= split_value]
     feature_negative_items = [weather_item for weather_item in samples if feature.value_extractor(weather_item) < split_value]
