@@ -101,9 +101,11 @@ class TreeLeaf:
                 return self.feature_negative_leaf.predict(weather_item)
 
     def __str__(self):
-        return "{0} split on {1}, {3}|{2}, Impurity: {4}".format(self.feature, self.split_value,
+        return "{0} split on {1}, {3}|{2}, Impurity: {4}|{5}, Weighted Impurity: {6}".format(self.feature, self.split_value,
                                                                  len(self.feature_positive_items),
                                                                  len(self.feature_negative_items),
+                                                                 gini_impurity(self.feature_positive_items),
+                                                                 gini_impurity(self.feature_negative_items),
                                                                  self.weighted_gini_impurity)
 
 
@@ -134,7 +136,7 @@ def build_leaf(sample_items, previous_leaf=None, random_feature_count=None):
             best_feature = feature
             best_split = split_value
 
-    # The gini impurity must be improved by the next best split, otherwise the branch ends here
+    # The gini impurity of the samples must be improved with the next best split, otherwise the branch ends here
     if previous_leaf is None or gini_impurity(sample_items) > best_impurity:
         return TreeLeaf(best_feature, best_split, sample_items)
     else:
@@ -151,12 +153,12 @@ def predict_weather_will_be_good(rain, lightning, cloudy, temperature):
 
     good_weather_vote = sum(1 if tree.predict(weather_item) >= .5 else 0 for tree in random_forest)
     print("Good weather vote: {0}/{1}".format(good_weather_vote, len(random_forest)))
-    probability_of_good_weather = good_weather_vote / len(random_forest)
+    rate_of_good_weather = good_weather_vote / len(random_forest)
 
-    if probability_of_good_weather >= .5:
-        return "Weather is good, {0}% confident\r\n".format(round(probability_of_good_weather * 100.0, 2))
+    if rate_of_good_weather >= .5:
+        return "Weather is good, {0}% records in node are good\r\n".format(round(rate_of_good_weather * 100.0, 2))
     else:
-        return "Weather is bad, {0}% confident it is good\r\n".format(round(probability_of_good_weather * 100.0, 2))
+        return "Weather is bad, {0}%  records in node  are bad\r\n".format(round(rate_of_good_weather * 100.0, 2))
 
 
 while True:
