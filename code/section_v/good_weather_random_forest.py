@@ -151,12 +151,12 @@ def predict_weather_will_be_good(rain, lightning, cloudy, temperature):
 
     good_weather_vote = sum(1 if tree.predict(weather_item) >= .5 else 0 for tree in random_forest)
     print("Good weather vote: {0}/{1}".format(good_weather_vote, len(random_forest)))
-    probability_of_leaving = good_weather_vote / len(random_forest)
+    probability_of_good_weather = good_weather_vote / len(random_forest)
 
-    if probability_of_leaving >= .5:
-        return "Weather is good, {0}% confident\r\n".format(round(probability_of_leaving * 100.0, 2))
+    if probability_of_good_weather >= .5:
+        return "Weather is good, {0}% confident\r\n".format(round(probability_of_good_weather * 100.0, 2))
     else:
-        return "Weather is bad, {0}% confident it is good\r\n".format(round(probability_of_leaving * 100.0, 2))
+        return "Weather is bad, {0}% confident it is good\r\n".format(round(probability_of_good_weather * 100.0, 2))
 
 
 while True:

@@ -100,20 +100,20 @@ class TreeLeaf:
                                                                  len(self.feature_negative_items), self.weighted_gini_impurity)
 
 
-def build_leaf(sample_employees, previous_leaf):
+def build_leaf(weather_items, previous_leaf):
     best_impurity = 1.0
     best_split = None
     best_feature = None
 
     # Find feature with lowest impurity
     for feature in features:
-        split_value = split_continuous_variable(feature, sample_employees)
+        split_value = split_continuous_variable(feature, weather_items)
 
         # If value cannot be split, skip
         if split_value is None:
             continue
 
-        impurity = gini_impurity_for_split(feature, split_value, sample_employees)
+        impurity = gini_impurity_for_split(feature, split_value, weather_items)
 
         # Keep track of best feature with lowest impurity
         if best_impurity > impurity:
@@ -122,8 +122,8 @@ def build_leaf(sample_employees, previous_leaf):
             best_split = split_value
 
     # The gini impurity must be improved by the next best split, otherwise the branch ends here
-    if previous_leaf is None or gini_impurity(sample_employees) > best_impurity:
-        return TreeLeaf(best_feature, best_split, sample_employees)
+    if previous_leaf is None or gini_impurity(weather_items) > best_impurity:
+        return TreeLeaf(best_feature, best_split, weather_items)
     else:
         return None
 
