@@ -19,9 +19,20 @@ print("INTERCEPT: {0}".format(fit.intercept_.flatten()))
 print(output)
 print(fit.predict(inputs))
 
+
+
+# Interact and test with new employee data
+def predict_employee_will_stay(sex, age, promotions, years_employed):
+    prediction = fit.predict([[sex, age, promotions, years_employed]])
+    if prediction == [[1]]:
+        return "WILL LEAVE: {0}".format(fit.predict_proba([[sex, age, promotions, years_employed]]))
+    else:
+        return "WILL STAY: {0}".format(fit.predict_proba([[sex, age, promotions, years_employed]]))
+
+
 # Test a predictions
 while True:
     n = input("Predict employee will stay or leave {sex},{age},{promotions},{years employed}: ")
     (sex, age, promotions, years_employed) = n.split(",")
-    print(fit.predict([[int(sex), int(age), int(promotions), int(years_employed)]]))
+    print(predict_employee_will_stay(int(sex), int(age), int(promotions), int(years_employed)))
 
