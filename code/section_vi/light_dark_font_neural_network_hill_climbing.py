@@ -11,7 +11,7 @@ training_data_count = len(training_data.index)
 learning_rate = 0.1
 
 # Extract the input columns, scale down by 255
-training_inputs = training_data.iloc[:, 0:3].values.transpose() / 255
+training_inputs = (training_data.iloc[:, 0:3].values.transpose() / 255.0 * .99) + .01
 
 # Extract output column, and generate an opposite column where 1 is 0 and 0 is 1.
 actual_outputs = np.vstack(
@@ -30,11 +30,14 @@ output_bias = np.random.rand(2, 1)
 def relu(x):
     return np.maximum(x, 0)
 
+
 def softmax(x):
     return special.softmax(x, axis=0)
 
+
 def tanh(x):
     return np.tanh(x)
+
 
 best_loss = 10_000_000_000
 
@@ -102,7 +105,8 @@ for i in range(1_000_000):
         output_bias[random_row, random_col] += random_adjust
 
     # Calculate outputs with the given weights, biases, and activation functions for all three layers
-    training_outputs = softmax(output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(training_inputs))))
+    training_outputs = softmax(
+        output_bias + output_weights.dot(tanh(middle_bias + middle_weights.dot(training_inputs))))
 
     # Calculate the mean squared loss
     mean_loss = np.sum((actual_outputs - training_outputs) ** 2) / training_data_count
