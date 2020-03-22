@@ -11,7 +11,7 @@ training_data_count = len(training_data.index)
 learning_rate = 0.1
 
 # Extract the input columns, scale down by 255
-training_inputs = training_data.iloc[:, 0:3].values.transpose() / 255
+training_inputs = (training_data.iloc[:, 0:3].values.transpose() / 255.0 * .99) + .01
 
 # Extract output column, and generate an opposite column where 1 is 0 and 0 is 1.
 actual_outputs = np.vstack(
