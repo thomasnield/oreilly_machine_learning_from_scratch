@@ -42,7 +42,7 @@ for i in range(epochs):
     elif random_b == 2:
         b2 += random_adjust
 
-    # Calculate loss, which is total mean squared error
+    # Calculate loss, which is total sum squared error
     new_loss = 0.0
     for p in points:
         new_loss += (p.y - (b0 + b1 * p.x1 + b2 * p.x2)) ** 2

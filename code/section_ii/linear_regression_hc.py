@@ -33,7 +33,7 @@ for i in range(epochs):
     m += m_adjust
     b += b_adjust
 
-    # Calculate loss, which is total mean squared error
+    # Calculate loss, which is total sum squared error
     new_loss = 0.0
     for p in points:
         new_loss += (p.y - (m * p.x + b)) ** 2
