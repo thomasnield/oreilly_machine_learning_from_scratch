@@ -144,7 +144,7 @@ def build_leaf(sample_items, previous_leaf=None, random_feature_count=None):
 
 
 random_forest = [build_leaf(sample_items=random.sample(all_samples, int(len(all_samples) * (2 / 3))),
-                            random_feature_count=random.choice(range(2, 3))) for i in range(1, 300)]
+                            random_feature_count=random.choice(range(2, 3))) for i in range(0, 300)]
 
 
 # Interact and test with new data
