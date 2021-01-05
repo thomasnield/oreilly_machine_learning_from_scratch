@@ -57,4 +57,4 @@ for i in range(1_000_000):
         b1 -= random_adjust
 
 print("1.0 / (1 + exp(-({0} + {1}*x))".format(b0, b1))
-print("BEST LIKELIHOOD: {0}".format(best_likelihood))
+print("BEST LIKELIHOOD: {0}".format(math.exp(best_likelihood)))

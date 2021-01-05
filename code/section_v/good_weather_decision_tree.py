@@ -47,7 +47,7 @@ def gini_impurity_for_split(feature, split_value, samples):
 
 
 def split_continuous_variable(feature, samples):
-    feature_values = list(set(feature.value_extractor(employee) for employee in samples))
+    feature_values = list(set(feature.value_extractor(weather_item) for weather_item in samples))
     feature_values.sort()
 
     feature_values2 = feature_values.copy()
