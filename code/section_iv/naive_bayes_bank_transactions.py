@@ -94,4 +94,4 @@ while True:
             best_probability = category_probability
             best_category = category
 
-    print("{0}, Probability: {1}\r\n%".format(best_category, round(best_probability * 100.0, 6)))
+    print("{0}, Probability: {1}%\r\n".format(best_category, round(best_probability * 100.0, 6)))
