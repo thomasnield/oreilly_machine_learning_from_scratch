@@ -1,5 +1,4 @@
 # Helpful resource: https://www.kaggle.com/wwsalmon/simple-mnist-nn-from-scratch-numpy-no-tf-keras/
-
 import numpy as np
 import pandas as pd
 
@@ -9,8 +8,8 @@ row_ct, col_ct = training_data.shape
 # Learning rate controls how slowly we approach a solution
 # Make it too small, it will take too long to run.
 # Make it too big, it will likely overshoot and miss the solution.
-L = 0.01
-sample_size = 10
+L = 0.1
+sample_size = 100
 
 # Extract the input columns, scale down by 255
 training_inputs = (training_data.iloc[:, 0:3].values / 255.0)
@@ -24,35 +23,34 @@ hidden_b = np.random.rand(3, 1)
 output_b = np.random.rand(1, 1)
 
 # Activation functions
-softplus = lambda x: np.log(1 + np.exp(x))
-relu = lambda x: np.max(0, x)
+# softplus = lambda x: np.log(1 + np.exp(x))
+relu = lambda x: np.maximum(x, 0)
 logistic = lambda x: 1 / (1 + np.exp(-x))
-softmax = lambda x: np.exp(x) / sum(np.exp(x))
+# softmax = lambda x: np.exp(x) / sum(np.exp(x))
 
 # Derivatives of Activation functions
-d_softplus = lambda x:  np.exp(x)/(np.exp(x) + 1)
+# d_softplus = lambda x:  np.exp(x)/(np.exp(x) + 1)
 d_relu = lambda x: x > 0
 d_logistic = lambda x: np.exp(-x)/(1 + np.exp(-x))**2
 
 # Stochastic Gradient descent
-
 def forward_prop(X):
-    Z1 = hidden_w.dot(X) + hidden_b
+    Z1 = hidden_w @ X + hidden_b
     A1 = relu(Z1)
-    Z2 = output_w.dot(A1) + output_b
-    A2 = softmax(Z2)
+    Z2 = output_w @ A1 + output_b
+    A2 = logistic(Z2)
     return Z1, A1, Z2, A2
 
 def backward_prop(Z1, A1, Z2, A2, X, Y):
     dZ2 = A2 - Y
-    dW2 = 1 / row_ct * dZ2.dot(A1.T)
+    dW2 = 1 / row_ct * dZ2 @ A1.T
     db2 = 1 / row_ct * np.sum(dZ2)
-    dZ1 = output_w.T.dot(dZ2) * d_relu(Z1)
-    dW1 = 1 / row_ct * dZ1.dot(X.T)
+    dZ1 = output_w.T @ dZ2 * d_relu(Z1)
+    dW1 = 1 / row_ct * dZ1 @ X.T
     db1 = 1 / row_ct * np.sum(dZ1)
     return dW1, db1, dW2, db2
 
-for i in range(1_000):
+for i in range(100_000):
 
     idx = np.random.choice(row_ct, sample_size, replace=False)
     X = training_inputs[idx].transpose()
@@ -66,21 +64,17 @@ for i in range(1_000):
     output_w -= L * dW2
     output_b -= L * db2
 
-    # predicted_output = logistic(output_bias + output_weights.dot(softplus(middle_bias + middle_weights.dot(input_sample))))
-    #error = (predicted_output - output_sample)**2
-
-
 
 # Interact and test with new colors
 def predict_probability(r, g, b):
-    input_colors = np.array([r, g, b]).transpose() / 255
-    output = logistic(output_b + output_w.dot(softplus(hidden_b + hidden_w.dot(input_colors))))
-    return output
+    X = np.array([[r, g, b]]).transpose() / 255
+    Z1, A1, Z2, A2 = forward_prop(X)
+    return A2
 
 
 def predict_font_shade(r, g, b):
     output_values = predict_probability(r, g, b)
-    if output_values[0, 0] > output_values[1, 0]:
+    if output_values > .5:
         return "DARK"
     else:
         return "LIGHT"
