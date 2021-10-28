@@ -1,5 +1,3 @@
-# work in progress
-
 import numpy as np
 import pandas as pd
 
@@ -19,10 +17,10 @@ training_outputs = training_data.iloc[:, -1].values
 
 # Build neural network with weights and biases
 middle_weights = np.random.rand(3, 3)
-output_weights = np.random.rand(2, 3)
+output_weights = np.random.rand(1, 3)
 
 middle_bias = np.random.rand(3, 1)
-output_bias = np.random.rand(2, 1)
+output_bias = np.random.rand(1, 1)
 
 # Activation functions
 softplus = lambda x: np.log(1 + np.exp(x))
@@ -42,7 +40,7 @@ for i in range(1_000_000):
     predicted_output = logistic(output_bias + output_weights.dot(softplus(middle_bias + middle_weights.dot(input_sample))))
 
     error = (predicted_output - output_sample)**2
-    
+
     # backpropogate?
     print(error)
 
