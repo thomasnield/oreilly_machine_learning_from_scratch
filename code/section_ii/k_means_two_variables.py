@@ -40,8 +40,6 @@ points = [(Point(row.x, row.y)) for index, row in pd.read_csv("https://tinyurl.c
 centroids = [Point(np.random.uniform(0,10), np.random.uniform(0,10)) for i in range(k)]
 
 # Move centroids for 1000 iterations using average technique
-best_loss = 1_000_000_000.0
-
 for i in range(1_000):
 
     for c in centroids:
