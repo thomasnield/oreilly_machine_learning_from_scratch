@@ -49,7 +49,7 @@ for i in range(epochs):
 
     # If loss has improved, keep new values. Otherwise revert.
     if new_loss < best_loss:
-        print("z = {0} + {1}x + {2}y".format(b0, b1, b2))
+        print("y = {0} + {1}x1 + {2}x2".format(b0, b1, b2))
         best_loss = new_loss
     else:
         if random_b == 0:
@@ -59,4 +59,4 @@ for i in range(epochs):
         elif random_b == 2:
             b2 -= random_adjust
 
-print("z = {0} + {1}x + {2}y".format(b0, b1, b2))
+print("y = {0} + {1}x1 + {2}x2".format(b0, b1, b2))
