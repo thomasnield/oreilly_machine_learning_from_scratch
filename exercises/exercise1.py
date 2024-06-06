@@ -17,7 +17,7 @@ points = [(Point(row.x, row.y)) for index, row in pd.read_csv("https://bit.ly/3O
 m = 0.0
 b = 0.0
 
-epochs = ?  # The number of iterations to perform
+epochs = 1000000  # The number of iterations to perform
 
 n = float(len(points))  # Number of points
 
@@ -30,13 +30,13 @@ for i in range(epochs):
     m_adjust = np.random.normal()
     b_adjust = np.random.normal()
 
-    m += ?
-    b += ?
+    m += m_adjust
+    b += b_adjust
 
     # Calculate loss, which is total sum squared error
     new_loss = 0.0
     for p in points:
-        new_loss += (? - (m * p.x + b)) ** 2
+        new_loss += (i - (m * p.x + b)) ** 2
 
     # If loss has improved, keep new values. Otherwise revert.
     if new_loss < best_loss:
