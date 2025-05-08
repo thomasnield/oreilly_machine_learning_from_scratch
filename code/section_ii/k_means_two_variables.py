@@ -63,3 +63,18 @@ for c in centroids:
 
     for p in points_for_centroid(c):
         print("    {0}".format(p))
+
+
+# plot
+import matplotlib.pyplot as plt
+import numpy as np
+
+# show in chart
+X = np.array([p.x for p in points])
+Y = np.array([p.y for p in points])
+XC = np.array([p.x for p in centroids])
+YC = np.array([p.y for p in centroids])
+plt.plot(X, Y, 'o') # scatterplot
+plt.plot(XC, YC, 'x') # centroids
+
+plt.show()

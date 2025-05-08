@@ -107,4 +107,4 @@ def predict_font_shade(r, g, b):
 while True:
     n = input("Predict light or dark font. Input values R,G,B: ")
     (r, g, b) = n.split(",")
-    print(predict_font_shade(int(r), int(g), int(b)))
+    print(predict_font_shade(int(r) / 255.0 , int(g) / 255.0, int(b) / 255.0))
