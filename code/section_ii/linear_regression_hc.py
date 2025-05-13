@@ -49,12 +49,14 @@ for i in range(epochs):
 print("y = {0}x + {1}".format(m, b))
 
 
-# plot
+
+
+# plot 
 import matplotlib.pyplot as plt
-import numpy as np
+import numpy as np 
 # show in chart
-X = np.array([p.x for p in df.itertuples()])
-Y = np.array([p.y for p in df.itertuples()])
+X = np.array([p.x for p in points])
+Y = np.array([p.y for p in points])
 
 plt.plot(X, Y, 'o') # scatterplot
 plt.plot(X, m*X+b) # line
