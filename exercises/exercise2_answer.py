@@ -25,7 +25,7 @@ class LabeledColor:
         return "{0},{1},{2}: {3}".format(self.red, self.green, self.blue, self.dark_font_ind)
 
 
-training_colors = [(LabeledColor(row[0], row[1], row[2], row[3])) for index, row in
+training_colors = [(LabeledColor(row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3])) for index, row in
                    pd.read_csv("https://tinyurl.com/y2qmhfsr").iterrows()]
 
 training_dark_colors = [c for c in training_colors if c.dark_font_ind == 1.0]
